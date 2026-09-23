@@ -1,0 +1,4 @@
+# TP1 - Procesamiento de Imágenes I (IA 4.4)
+numpy          # manejo de imágenes como arrays, np.sum por filas/columnas (Problema 2)
+opencv-python  # cv2.copyMakeBorder, umbralización, connectedComponentsWithStats
+matplotlib     # visualización de imágenes, histogramas y resultados
