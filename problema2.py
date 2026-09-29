@@ -81,10 +81,10 @@ def condicion(letra):
     return 'R' if agujeros else 'L'
 
 
-def imagen_no_aprobados(ruta, sep=10, ancho_etiqueta=40):
+def imagen_no_aprobados(ruta, img, img_th, filas, cols, registros, sep=10, ancho_etiqueta=40):
     # Arma una única imagen con el recorte del Nombre y Apellido de cada alumno con todos los campos OK
     # y Condición Final L o R. Indicador: letra y recuadro rojos para R, azules para L (colores en BGR).
-    img, img_th, filas, cols, registros = validar_planilla(ruta)
+    # Recibe lo que devuelve validar_planilla (punto a) para no procesar la planilla dos veces.
     alumnos = [(condicion(celda(img_th, filas, cols, i, 6).astype(np.uint8)), celda(img, filas, cols, i, 2))
                for i, oks in enumerate(registros, start=1) if all(oks)]
     alumnos = [(c, nombre) for c, nombre in alumnos if c]
@@ -106,5 +106,30 @@ def imagen_no_aprobados(ruta, sep=10, ancho_etiqueta=40):
     return alumnos
 
 
+# --- Problema 2.c - CSV con los resultados de la validación -------------------
+def guardar_csv(ruta, registros):
+    # Una fila por registro: ID (orden en la planilla) + un OK/MAL por campo, respetando el orden de la planilla.
+    ruta_csv = Path(ruta).with_name(f'validacion_{Path(ruta).stem}.csv')
+    with open(ruta_csv, 'w', encoding='utf-8') as f:
+        f.write('ID,Legajo,Nombre y Apellido,Parcial 1,Parcial 2,Parcial 3,Condición Final\n')   # Columnas del enunciado (c.ii)
+        for i, oks in enumerate(registros, start=1):
+            f.write(f'{i},' + ','.join('OK' if ok else 'MAL' for ok in oks) + '\n')
+    print(f'CSV de validación: {ruta_csv.name}')
+
+
+# --- Problema 2.d - Aplicación cíclica sobre las cuatro planillas --------------
 if __name__ == '__main__':
-    imagen_no_aprobados(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).parent / 'grade_sheet_1.png')
+    # Sin argumentos procesa grade_sheet_1..4; con argumentos, sólo las planillas indicadas.
+    rutas = sys.argv[1:] or [Path(__file__).parent / f'grade_sheet_{k}.png' for k in range(1, 5)]
+    for ruta in rutas:
+        print(f'\n=============== {Path(ruta).name} ===============')
+        img, img_th, filas, cols, registros = validar_planilla(ruta)       # Punto a
+        alumnos = imagen_no_aprobados(ruta, img, img_th, filas, cols, registros)   # Punto b
+        guardar_csv(ruta, registros)                                        # Punto c
+
+        # Informe de resultados de la planilla
+        n_ok = sum(all(oks) for oks in registros)
+        mal = [sum(not oks[j] for oks in registros) for j in range(len(CAMPOS))]
+        print(f'Registros correctos: {n_ok} de {len(registros)}')
+        print('Campos MAL: ' + ', '.join(f'{campo} {m}' for (campo, _), m in zip(CAMPOS, mal)))
+        print(f'No aprobados: {sum(c == "R" for c, _ in alumnos)} R, {sum(c == "L" for c, _ in alumnos)} L')
