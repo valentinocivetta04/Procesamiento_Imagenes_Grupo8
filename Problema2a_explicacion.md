@@ -8,7 +8,7 @@ El código está en `problema2.py`. Se corre así:
 python problema2.py grade_sheet_2.png
 ```
 
-Sin argumento usa `grade_sheet_1.png`.
+Sin argumento procesa las cuatro planillas (ver `Problema2cd_explicacion.md`).
 
 ## Qué pide el punto a
 
