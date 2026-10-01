@@ -1,4 +1,3 @@
-import sys
 import cv2
 import numpy as np
 from pathlib import Path
@@ -17,7 +16,7 @@ CAMPOS = [('Legajo',            lambda c, p: c == 8 and p == 1),
 def pulsos(v):
     # v : Vector booleano. Devuelve una fila [inicio, fin] por cada tramo de valores True.
     # (Técnica "Encontrar inicio/fin de pulsos" de PDI_U1_p1_Letras.py)
-    idx = np.argwhere(np.diff(v)).ravel()
+    idx = np.argwhere(np.diff(v))
     idx[0::2] += 1
     return idx.reshape(-1, 2)
 
@@ -42,10 +41,9 @@ def validar_planilla(ruta, th=150, th_area=1, th_espacio=6):
     img_rows = np.sum(img_th, 1)
     filas = pulsos(img_rows > 0.8 * img_rows.max())
 
-    # Líneas verticales: sólo en la zona de registros (entre la línea bajo el encabezado y la última),
-    # así las divisiones de Parcial 1/2/3 tienen el mismo largo que las demás.
-    img_cols = np.sum(img_th[filas[1, 1]:filas[-1, 0]], 0)
-    cols = pulsos(img_cols > 0.8 * img_cols.max())
+    # Líneas verticales: umbral propio, más bajo porque las divisiones de Parcial 1/2/3 son más cortas (AYUDA del TP)
+    img_cols = np.sum(img_th, 0)
+    cols = pulsos(img_cols > 0.6 * img_cols.max())
 
     registros = []
     for i in range(1, len(filas) - 1):                  # Cada registro está entre dos líneas horizontales
@@ -58,7 +56,7 @@ def validar_planilla(ruta, th=150, th_area=1, th_espacio=6):
             stats = sorted(stats, key=lambda s: s[0])       # Caracteres ordenados de izquierda a derecha
             gaps = [b[0] - (a[0] + a[2]) for a, b in zip(stats, stats[1:])]  # Columnas vacías entre caracteres
             n_car = len(stats)
-            n_pal = 0 if n_car == 0 else 1 + sum(g > th_espacio for g in gaps)
+            n_pal = 1 + sum(g > th_espacio for g in gaps)
             oks.append(regla(n_car, n_pal))
             print(f'> {campo}: {"OK" if oks[-1] else "MAL"}')
         print('>')
@@ -81,24 +79,19 @@ def condicion(letra):
     return 'R' if agujeros else 'L'
 
 
-def imagen_no_aprobados(ruta, img, img_th, filas, cols, registros, sep=10, ancho_etiqueta=40):
-    # Arma una única imagen con el recorte del Nombre y Apellido de cada alumno con todos los campos OK
-    # y Condición Final L o R. Indicador: letra y recuadro rojos para R, azules para L (colores en BGR).
-    # Recibe lo que devuelve validar_planilla (punto a) para no procesar la planilla dos veces.
-    alumnos = [(condicion(celda(img_th, filas, cols, i, 6).astype(np.uint8)), celda(img, filas, cols, i, 2))
-               for i, oks in enumerate(registros, start=1) if all(oks)]
-    alumnos = [(c, nombre) for c, nombre in alumnos if c]
-
-    h, w = celda(img, filas, cols, 1, 2).shape
-    salida = np.full((max(len(alumnos), 1) * (h + sep) + sep, ancho_etiqueta + w + sep, 3), 255, np.uint8)
-    if not alumnos:
-        cv2.putText(salida, 'Sin alumnos L/R', (sep, h), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 1)
-    for k, (c, nombre) in enumerate(alumnos):
-        y0, x0 = sep + k * (h + sep), ancho_etiqueta
-        color = (0, 0, 255) if c == 'R' else (255, 0, 0)
-        salida[y0:y0 + h, x0:x0 + w] = cv2.cvtColor(nombre, cv2.COLOR_GRAY2BGR)     # Pego el recorte
-        cv2.rectangle(salida, (x0 - 1, y0 - 1), (x0 + w, y0 + h), color, 2)
-        cv2.putText(salida, c, (10, y0 + h // 2 + 8), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+def imagen_no_aprobados(ruta, img, img_th, filas, cols, registros):
+    # Una fila por alumno con todos los campos OK y Condición Final L o R:
+    # letra indicadora (roja R, azul L; colores en BGR) + crop del Nombre y Apellido.
+    alumnos, salida = [], []
+    for i, oks in enumerate(registros, start=1):
+        c = condicion(celda(img_th, filas, cols, i, 6).astype(np.uint8)) if all(oks) else None
+        if c:
+            fila = cv2.copyMakeBorder(celda(img, filas, cols, i, 2), 5, 5, 40, 5, cv2.BORDER_CONSTANT, value=255)
+            fila = cv2.cvtColor(fila, cv2.COLOR_GRAY2BGR)
+            cv2.putText(fila, c, (10, fila.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255) if c == 'R' else (255, 0, 0), 2)
+            alumnos.append(c)
+            salida.append(fila)
+    salida = np.vstack(salida) if salida else cv2.putText(np.full((30, 200), 255, np.uint8), 'Sin alumnos L/R', (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, 0, 1)
 
     ruta_salida = Path(ruta).with_name(f'no_aprobados_{Path(ruta).stem}.png')
     cv2.imwrite(str(ruta_salida), salida)
@@ -119,9 +112,8 @@ def guardar_csv(ruta, registros):
 
 # --- Problema 2.d - Aplicación cíclica sobre las cuatro planillas --------------
 if __name__ == '__main__':
-    # Sin argumentos procesa grade_sheet_1..4; con argumentos, sólo las planillas indicadas.
-    rutas = sys.argv[1:] or [Path(__file__).parent / f'grade_sheet_{k}.png' for k in range(1, 5)]
-    for ruta in rutas:
+    for k in range(1, 5):
+        ruta = Path(__file__).parent / f'grade_sheet_{k}.png'
         print(f'\n=============== {Path(ruta).name} ===============')
         img, img_th, filas, cols, registros = validar_planilla(ruta)       # Punto a
         alumnos = imagen_no_aprobados(ruta, img, img_th, filas, cols, registros)   # Punto b
@@ -132,4 +124,4 @@ if __name__ == '__main__':
         mal = [sum(not oks[j] for oks in registros) for j in range(len(CAMPOS))]
         print(f'Registros correctos: {n_ok} de {len(registros)}')
         print('Campos MAL: ' + ', '.join(f'{campo} {m}' for (campo, _), m in zip(CAMPOS, mal)))
-        print(f'No aprobados: {sum(c == "R" for c, _ in alumnos)} R, {sum(c == "L" for c, _ in alumnos)} L')
+        print(f'No aprobados: {alumnos.count("R")} R, {alumnos.count("L")} L')
