@@ -5,8 +5,7 @@ Procesamiento de Imágenes I (IA 4.4) · TUIA – FCEIA – UNR · 2026, 2° sem
 Con estos dos puntos queda terminado el Problema 2. Todo sigue en `problema2.py`:
 
 ```bash
-python problema2.py                      # procesa grade_sheet_1..4 (punto d)
-python problema2.py grade_sheet_2.png    # procesa solo esa planilla
+python problema2.py    # procesa grade_sheet_1..4 (punto d)
 ```
 
 Por cada planilla imprime la validación del punto a, guarda la imagen del punto b (`no_aprobados_grade_sheet_<id>.png`), guarda el CSV del punto c (`validacion_grade_sheet_<id>.csv`) y muestra un resumen.
@@ -40,7 +39,7 @@ El bloque principal del script recorre las planillas con un `for`. Para cada una
 3. Guarda el CSV (punto c).
 4. Imprime un resumen: cuántos registros tienen los seis campos bien, cuántos MAL hay en cada campo y cuántos alumnos quedaron en R y en L.
 
-Los nombres de las planillas se arman con el índice (`grade_sheet_{k}.png` para k de 1 a 4). Es el mismo recurso que usa `U1/PDI_U1_p1_Letras.py` en la MEJORA 2 para nombrar un archivo por letra con un f-string. Armando la lista así queda afuera `grade_sheet_empty.png`, que no tiene registros. Si se le pasan rutas por línea de comandos, procesa solo esas.
+Los nombres de las planillas se arman con el índice (`grade_sheet_{k}.png` para k de 1 a 4). Es el mismo recurso que usa `U1/PDI_U1_p1_Letras.py` en la MEJORA 2 para nombrar un archivo por letra con un f-string. Armando los nombres así queda afuera `grade_sheet_empty.png`, que no tiene registros.
 
 ## Resultados
 
@@ -59,17 +58,16 @@ Lo que se ve en los números:
 
 ## Verificación
 
-- El script corre sin errores sin argumentos (las cuatro planillas) y con una planilla suelta.
+- El script corre sin errores con las cuatro planillas.
 - La salida del punto a es idéntica a la de antes del cambio, en las cuatro planillas. Lo comparamos línea por línea.
 - Cada CSV tiene 21 líneas (encabezado + 20 registros), 7 columnas, los IDs del 1 al 20 en orden y exactamente los mismos OK/MAL que imprime la consola. Esto también lo chequeamos automáticamente con las cuatro planillas.
-- La imagen del punto b de la planilla 1 salió idéntica byte a byte a la que ya estaba commiteada.
+- Las imágenes del punto b tienen los mismos alumnos, en el mismo orden y con la misma letra que antes de simplificar su formato (ver `Problema2b_explicacion.md`).
 
 ## Cosas que decidimos nosotros
 
 - Escribir el CSV con `open`/`write`. El material no tiene ningún ejemplo, así que usamos lo más simple de Python base.
 - El encabezado del CSV usa "Nombre y Apellido", como pide c.ii. En la consola sigue saliendo "Nombre y apellido", como en el ejemplo del punto a. El enunciado usa las dos formas.
 - Los CSV y las imágenes se guardan al lado de cada planilla. El enunciado no dice dónde.
-- La lectura de rutas por línea de comandos (`sys.argv`) tampoco está en el material. Es Python base y solo sirve para elegir qué planillas procesar.
 
 ## Estado del TP
 
@@ -85,4 +83,4 @@ No quedan puntos del enunciado sin resolver. Antes de entregar convendría consu
 | `TUIA_PDI_TP1_2026_C2.pdf` (en el repo del grupo) | Consigna de c (ID, orden y nombres de las columnas, valores OK/MAL) y de d |
 | `U1/PDI_U1_p1_Letras.py` | Nombrar archivos de salida con el índice en un f-string, dentro de un `for` (MEJORA 2) |
 | `U2/Ejercicios-20260923/PDI_U2_p2_stain.py` | `pathlib.Path` para armar rutas |
-| Sin fuente en el material | Escritura del CSV con `open`/`write` y lectura de argumentos con `sys.argv` (Python base) |
+| Sin fuente en el material | Escritura del CSV con `open`/`write` (Python base) |

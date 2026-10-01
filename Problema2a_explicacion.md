@@ -5,10 +5,10 @@ Procesamiento de Imágenes I (IA 4.4) · TUIA – FCEIA – UNR · 2026, 2° sem
 El código está en `problema2.py`. Se corre así:
 
 ```bash
-python problema2.py grade_sheet_2.png
+python problema2.py
 ```
 
-Sin argumento procesa las cuatro planillas (ver `Problema2cd_explicacion.md`).
+Procesa las cuatro planillas (ver `Problema2cd_explicacion.md`).
 
 ## Qué pide el punto a
 
@@ -47,9 +47,9 @@ En las cuatro planillas aparecen 22 líneas: el borde de arriba de la tabla, la 
 
 ### 3. Encontrar las líneas verticales
 
-Hacemos lo mismo con las columnas (`np.sum(..., 0)`), pero solo en la zona de los registros, entre la línea de abajo del encabezado y la última línea. Si sumáramos toda la altura, las divisiones entre Parcial 1, 2 y 3 quedarían más cortas que el resto (arrancan en el sub-encabezado) y el logo y el título meterían ruido. Recortando esa zona, todas las líneas verticales tienen el mismo largo y el umbral del 80 % las toma a las 8.
+Hacemos lo mismo con las columnas (`np.sum(img_th, 0)`) sobre toda la imagen, pero con un umbral propio: el 60 % del máximo. Las divisiones entre Parcial 1, 2 y 3 son más cortas que el resto (arrancan en el sub-encabezado), así que el umbral tiene que ser más bajo que el de las filas. Medido en las cuatro planillas, las líneas verticales llegan como mínimo al 83 % del máximo y ninguna otra columna pasa del 37 %, así que el 60 % las toma a las 8 con margen de los dos lados.
 
-- De dónde sale: la AYUDA del TP (`img_cols = np.sum(img_th_ones, 0)`) y `PDI_U2_p2_stain.py`, que primero recorta la franja horizontal y después busca los límites por columnas.
+- De dónde sale: la AYUDA del TP (`img_cols = np.sum(img_th_ones, 0)` y "un umbral acorde (uno para las líneas horizontales y otro para las líneas verticales)").
 
 Las 8 líneas definen 7 columnas. La primera es "Nro." y no se valida.
 
@@ -96,7 +96,7 @@ Corrimos el script sobre las cuatro planillas y comparamos a mano los 80 registr
 - **Los 12 caracteres del nombre no cuentan el espacio.** El enunciado dice "no más de 12 caracteres en total" pero no aclara si el espacio suma. Contando componentes conectadas el espacio no aparece (no tiene píxeles), así que contamos solo letras. Con esa interpretación AMANDA SANTOS (12 letras) da OK. Si la cátedra quiere contar el espacio, alcanza con sumar `n_pal - 1` a los caracteres.
 - **Una fila vacía da todo MAL.** Ningún campo vacío cumple su regla, así que es lo que sale de aplicar el enunciado tal cual.
 - **La Ñ se contaría como dos caracteres** (la N y la tilde son dos componentes). En las planillas no aparece ninguna, así que no lo resolvimos. Si hiciera falta, habría que unir las componentes que se superponen en x.
-- **Los umbrales (150, 80 % del máximo, área 1, espacio 6 px)** no salen de ningún archivo. La AYUDA dice que hay que "definir un umbral acorde", y estos los ajustamos mirando las cuatro planillas.
+- **Los umbrales (150, 80 % del máximo para las filas, 60 % para las columnas, área 1, espacio 6 px)** no salen de ningún archivo. La AYUDA dice que hay que "definir un umbral acorde", y estos los ajustamos mirando las cuatro planillas.
 
 ## Próximos pasos (Parte 2, puntos b, c y d)
 

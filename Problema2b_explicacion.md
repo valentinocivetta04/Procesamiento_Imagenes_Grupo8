@@ -5,10 +5,10 @@ Procesamiento de Imágenes I (IA 4.4) · TUIA – FCEIA – UNR · 2026, 2° sem
 El código sigue en `problema2.py`, a continuación del punto a. Se corre igual que antes:
 
 ```bash
-python problema2.py grade_sheet_1.png
+python problema2.py
 ```
 
-Primero imprime la validación del punto a y después guarda la imagen del punto b al lado de la planilla, con el nombre `no_aprobados_grade_sheet_1.png`.
+Para cada planilla primero imprime la validación del punto a y después guarda la imagen del punto b al lado de la planilla, con el nombre `no_aprobados_grade_sheet_<id>.png`.
 
 ## Qué pide el punto b
 
@@ -39,18 +39,18 @@ Antes de escribir la regla medimos todas las celdas de Condición Final con un s
 
 ### 3. Armar la imagen de salida
 
-Creamos una imagen en blanco con `np.full` del tamaño justo para apilar los recortes uno debajo del otro, con un margen a la izquierda para el indicador. Después pegamos cada recorte de Nombre y Apellido en su lugar asignando la región por índices.
+Cada alumno es una fila de la imagen: al recorte de Nombre y Apellido le agregamos un margen blanco con `cv2.copyMakeBorder` (40 px a la izquierda para el indicador y 5 px en los otros lados) y escribimos la letra de la condición en ese margen. Después apilamos las filas una debajo de la otra con `np.vstack`. Así no hace falta calcular el tamaño de la imagen ni la posición de cada recorte.
 
-- Pegar un recorte en una imagen por índices está en `U2/Código-20260826/PI_U2_ej_blurred_face.py` (`img3[xi:xi+H, yi:yi+W] = sub_face`), y `np.full` para crear una matriz está en ese mismo archivo, en la versión con máscaras.
+- `cv2.copyMakeBorder` es la AYUDA del Problema 1 del mismo enunciado. Usamos `cv2.BORDER_CONSTANT` con valor 255 para que el margen sea blanco.
+- `np.vstack` es NumPy básico; no aparece en el material.
 - El recorte sale de la imagen en grises, así que lo pasamos a 3 canales con `cv2.cvtColor` para poder dibujar en color, como hace `PDI_U3_Segmentacion.py` con `COLOR_GRAY2RGB` antes de dibujar contornos.
 
-El indicador es doble: la letra de la condición escrita a la izquierda y un recuadro alrededor del nombre, en rojo para R y en azul para L.
+El indicador es la letra de la condición escrita a la izquierda, en rojo para R y en azul para L. El enunciado pide "algún indicador", así que alcanza con uno.
 
-- `cv2.rectangle` está en `PDI_U3_Segmentacion.py` (bounding boxes de las componentes conectadas) y en `PI_U2_ej_blurred_face.py`.
 - `cv2.putText` está en `U2/Código-20260826/PI_U2_ej_video_face_detection_and_blur.py`.
 - Los colores van en BGR porque la imagen se guarda con `cv2.imwrite`. `PI_U2_ej_blurred_face.py` muestra que OpenCV trabaja en BGR, y `cv2.imwrite` se usa en `U1/PDI_U1_Fundamentos_p1.py`.
 
-Si en una planilla no queda ningún alumno L o R, igual se genera la imagen con el texto "Sin alumnos L/R", para que siempre haya una única salida por planilla.
+Si en una planilla no queda ningún alumno L o R, igual se genera una imagen chica (creada con `np.full`, como en `U2/Código-20260826/PI_U2_ej_blurred_face.py`) con el texto "Sin alumnos L/R", para que siempre haya una única salida por planilla. Hace falta porque `np.vstack` de una lista vacía da error, y la planilla 3 no tiene ningún alumno L o R.
 
 ## Verificación
 
@@ -68,7 +68,7 @@ En la planilla 4 también hay registros con todo OK y condición A (Juana Gomez,
 ## Cosas que decidimos nosotros
 
 - El criterio de la columna izquierda llena no está en el material. Sí están las herramientas (suma por columnas y bounding box), pero la idea de usarlas para separar A de L y R es nuestra y la validamos con las 56 celdas que hay en las planillas. Si apareciera otra letra con trazo vertical a la izquierda (B, D, P...), se clasificaría como L o R según tenga agujero o no. Como el enunciado solo habla de L y R, no lo cubrimos.
-- El formato de la imagen (apilado vertical, letra más recuadro, rojo y azul) lo elegimos nosotros. El enunciado solo pide "algún indicador".
+- El formato de la imagen (apilado vertical, letra roja o azul a la izquierda) lo elegimos nosotros. El enunciado solo pide "algún indicador".
 - La imagen se guarda al lado de la planilla de entrada. El enunciado no dice dónde.
 
 ## Próximos pasos (puntos c y d)
@@ -90,10 +90,10 @@ Esto es solo el enfoque. Todavía no está implementado.
 
 | Archivo | Qué se tomó |
 |---|---|
-| `TUIA_PDI_TP1_2026_C2.pdf` (en el repo del grupo) | Consigna del punto b y suma por columnas de la AYUDA |
-| `U3/Código-20260923/PDI_U3_Segmentacion.py` | `connectedComponentsWithStats` y `stats` (bounding box), `findContours` con `RETR_TREE` y jerarquía `[Next, Previous, First_Child, Parent]`, filtrado por `Parent`, `cv2.rectangle`, `cvtColor` de gris a color |
+| `TUIA_PDI_TP1_2026_C2.pdf` (en el repo del grupo) | Consigna del punto b, suma por columnas de la AYUDA y `cv2.copyMakeBorder` de la AYUDA del Problema 1 |
+| `U3/Código-20260923/PDI_U3_Segmentacion.py` | `connectedComponentsWithStats` y `stats` (bounding box), `findContours` con `RETR_TREE` y jerarquía `[Next, Previous, First_Child, Parent]`, filtrado por `Parent`, `cvtColor` de gris a color |
 | `U2/Ejercicios-20260923/PDI_U2_p2_stain.py` | `np.sum` por columnas sobre una matriz booleana, uso de `pathlib.Path` |
-| `U2/Código-20260826/PI_U2_ej_blurred_face.py` | Pegar un recorte en una imagen por índices, `np.full`, `cv2.rectangle`, orden BGR de OpenCV |
+| `U2/Código-20260826/PI_U2_ej_blurred_face.py` | `np.full`, orden BGR de OpenCV |
 | `U2/Código-20260826/PI_U2_ej_video_face_detection_and_blur.py` | `cv2.putText` |
 | `U1/PDI_U1_Fundamentos_p1.py` | `cv2.imwrite` |
 | `U1/PDI_U1_p1_Letras.py` | Para el punto d: guardar un archivo por elemento con un `for` |
