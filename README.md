@@ -33,42 +33,10 @@ El Problema 2 valida de forma automática planillas de calificaciones en formato
 ├── grade_sheet_1.png                           Entrada del Problema 2: planilla 1.
 ├── grade_sheet_2.png                           Entrada del Problema 2: planilla 2.
 ├── grade_sheet_3.png                           Entrada del Problema 2: planilla 3.
-├── grade_sheet_4.png                           Entrada del Problema 2: planilla 4.
-├── validacion_grade_sheet_1.csv                Salida del punto 2c para la planilla 1.
-├── validacion_grade_sheet_2.csv                Salida del punto 2c para la planilla 2.
-├── validacion_grade_sheet_3.csv                Salida del punto 2c para la planilla 3.
-├── validacion_grade_sheet_4.csv                Salida del punto 2c para la planilla 4.
-├── Problema1a_explicacion.md                   Notas de trabajo del punto 1a.
-├── Problema1bc_explicacion.md                  Notas de trabajo de los puntos 1b y 1c.
-├── Problema2a_explicacion.md                   Notas de trabajo del punto 2a.
-├── Problema2b_explicacion.md                   Notas de trabajo del punto 2b.
-├── Problema2cd_explicacion.md                  Notas de trabajo de los puntos 2c y 2d.
-└── informe_capturas/                           Capturas de los pasos intermedios usadas en el informe.
-    ├── p1_paso01_original_histograma.png       Imagen original e histograma.
-    ├── p1_paso02_zonas_fijas.png               Los cinco cuadrados de la tabla ZONAS sobre la imagen.
-    ├── p1_paso03_borde_replicado.png           Imagen con borde replicado (ventana 21x21).
-    ├── p1_paso04_ventana_ejemplo.png           Una ventana 21x21 antes y después de ecualizar.
-    ├── p1_paso05_global_vs_local_21x21.png     Original, ecualización global y local 21x21.
-    ├── p1_paso06_detalles_por_zona.png         Zoom de cada zona, antes y después.
-    ├── p1_paso07_ventanas_cuadradas.png        Imagen completa con ventanas cuadradas.
-    ├── p1_paso08_zonas_vs_ventana.png          Cada zona con cada tamaño de ventana.
-    ├── p1_paso09_ventanas_rectangulares.png    Resultado con ventanas rectangulares.
-    ├── p2_s1_paso01_gris_umbral.png            Planilla 1 en grises y umbralada.
-    ├── p2_s1_paso02_proyecciones.png           Sumas por fila y por columna de la planilla 1.
-    ├── p2_s1_paso03_grilla.png                 Líneas de la tabla detectadas en la planilla 1.
-    ├── p2_paso04_celda_componentes.png         Caracteres y palabras en tres celdas de ejemplo.
-    ├── p2_paso05_letras_L_R_A.png              Las letras L, R y A con las medidas que las distinguen.
-    ├── p2_s1_paso06_resultado_celdas.png       Resultado OK/MAL por celda, planilla 1.
-    ├── p2_s2_paso06_resultado_celdas.png       Resultado OK/MAL por celda, planilla 2.
-    ├── p2_s3_paso06_resultado_celdas.png       Resultado OK/MAL por celda, planilla 3.
-    ├── p2_s4_paso06_resultado_celdas.png       Resultado OK/MAL por celda, planilla 4.
-    ├── p2_s1_paso07_salida_no_aprobados.png    Imagen de no aprobados, planilla 1.
-    ├── p2_s2_paso07_salida_no_aprobados.png    Imagen de no aprobados, planilla 2.
-    ├── p2_s3_paso07_salida_no_aprobados.png    Imagen de no aprobados, planilla 3.
-    └── p2_s4_paso07_salida_no_aprobados.png    Imagen de no aprobados, planilla 4.
+└── grade_sheet_4.png                           Entrada del Problema 2: planilla 4.
 ```
 
-`problema2.py` también genera `no_aprobados_grade_sheet_<id>.png` (punto 2b) junto a cada planilla. Esos archivos no están en el repositorio porque el `.gitignore` los excluye.
+`problema2.py` genera al ejecutarse `no_aprobados_grade_sheet_<id>.png` (punto 2b) y `validacion_grade_sheet_<id>.csv` (punto 2c) junto a cada planilla. Esos archivos de salida no están en el repositorio.
 
 ## Requisitos
 
@@ -133,4 +101,4 @@ python problema2.py
 
 ## Informe
 
-El informe con la descripción de los ejercicios, el análisis de los problemas, las técnicas, el desarrollo paso a paso y las conclusiones está en [Informe_TP1_PDI_Grupo8.pdf](Informe_TP1_PDI_Grupo8.pdf). Las capturas que usa están en la carpeta [informe_capturas](informe_capturas/).
+El informe con la descripción de los ejercicios, el análisis de los problemas, las técnicas, el desarrollo paso a paso y las conclusiones está en [Informe_TP1_PDI_Grupo8.pdf](Informe_TP1_PDI_Grupo8.pdf).
