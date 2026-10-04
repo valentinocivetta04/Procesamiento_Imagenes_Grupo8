@@ -25,7 +25,7 @@ El Problema 2 valida de forma automática planillas de calificaciones en formato
 ├── Informe_TP1_PDI_Grupo8.pdf                  Informe del trabajo práctico.
 ├── TUIA_PDI_TP1_2026_C2.pdf                    Consigna del TP.
 ├── requirements.txt                            Dependencias del proyecto.
-├── .gitignore                                  Excluye .venv/, archivos temporales y las imágenes no_aprobados_*.png.
+├── .gitignore                                  Excluye .venv/, archivos temporales y los archivos de salida (no_aprobados_*.png y validacion_*.csv).
 ├── problema1.py                                Problema 1: ecualización local, detalles ocultos y análisis de ventanas.
 ├── problema2.py                                Problema 2: validación de planillas, imagen de no aprobados y CSV.
 ├── Imagen_con_detalles_escondidos.tif          Entrada del Problema 1 (256x256, 8 bits).
