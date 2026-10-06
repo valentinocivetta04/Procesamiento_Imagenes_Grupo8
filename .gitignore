@@ -16,3 +16,11 @@ desktop.ini
 # Archivos de salida del problema 2 (se generan al correr problema2.py)
 no_aprobados_*.png
 validacion_*.csv
+
+# Material de trabajo local
+Problema1a_explicacion.md
+Problema1bc_explicacion.md
+Problema2a_explicacion.md
+Problema2b_explicacion.md
+Problema2cd_explicacion.md
+TP1_imagenes.zip
